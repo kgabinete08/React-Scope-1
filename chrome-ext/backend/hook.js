@@ -7,6 +7,7 @@ const devTools = window.__REACT_DEVTOOLS_GLOBAL_HOOK__;
 let fiberDOM;
 let currState;
 let initialState;
+let reduxStore15;
 
 let runFifteen = false;
 
@@ -113,7 +114,7 @@ async function getFiberDOM15() {
   // console.log("getFiberDOM15 is running")
   try {
     currState = await parseData();
-    // console.log("Current State: ", currState);
+    // don't send if state is null
     transmitData(currState);
   } catch (e) {
     console.log(e);
@@ -140,6 +141,7 @@ function traverseFifteen(node, cache) {
     state: null,
     props: null,
     children: {},
+    store: null,
   };
 
   if (targetNode.type) {
@@ -149,6 +151,13 @@ function traverseFifteen(node, cache) {
       component.name = targetNode.type.displayName;
     } else {
       component.name = targetNode.type;
+    }
+  }
+
+  // redux
+  if (targetNode.props) {
+    if (targetNode.type.name === 'Provider') {
+      component.store = targetNode.props.store.getState();
     }
   }
 
@@ -221,6 +230,13 @@ function traverseComp(node, cache) {
     component.state = node.memoizedState;
   }
 
+  // redux store
+  if (node.type) {
+    if (node.type.name === 'Provider') {
+      reduxStore15 = node.stateNode.store.getState();
+    }
+  }
+
   if (node.memoizedProps) {
     const props = [];
     if (typeof node.memoizedProps === 'object') {
@@ -262,13 +278,14 @@ function checkReactDOM(reactDOM) {
     return;
   }
   data.currentState = cache;
+  data.currentState[1].store = reduxStore15;
   // console.log('Store with Hierarchy: ', data);
   return data;
 }
 
-function transmitData(cache) {
-  console.log('transmitting', cache);
+function transmitData(state) {
+  console.log('cache', state);
   // create a custom event to dispatch for actions for requesting data from background
-  const customEvent = new CustomEvent('React-Scope-Test', { detail: { data: stringifyData(cache) } });
+  const customEvent = new CustomEvent('React-Scope-Test', { detail: { data: stringifyData(state) } });
   window.dispatchEvent(customEvent);
 }
