@@ -17,7 +17,7 @@ function getInitialStateOnce() {
   return function getInitialState() {
     if (!run) {
       // grab initial state
-      var initStateSet = devTools._fiberRoots[rid];
+      let initStateSet = devTools._fiberRoots[rid];
       initStateSet.forEach((item) => {
         initialState = item;
       });
@@ -122,20 +122,20 @@ async function getFiberDOM15() {
 
 // parse data from React 15
 async function parseData(components = {}) {
-  var root = reactInstance.Mount._instancesByReactRootID[1]._renderedComponent;
+  let root = reactInstance.Mount._instancesByReactRootID[1]._renderedComponent;
   traverseFifteen(root, components);
   // console.log(components)
-  var data = { currentState: components };
+  let data = { currentState: components };
   return data;
 }
 
 // traverse React 15
 function traverseFifteen(node, cache) {
-  var targetNode = node._currentElement;
+  let targetNode = node._currentElement;
   if (!targetNode) {
     return;
   }
-  var component = {
+  let component = {
     name: '',
     state: null,
     props: null,
@@ -162,9 +162,9 @@ function traverseFifteen(node, cache) {
 
   // props
   if (targetNode && targetNode.props) {
-    var props = [];
+    let props = [];
     if (typeof targetNode.props === 'object') {
-      var keys = Object.keys(targetNode.props);
+      let keys = Object.keys(targetNode.props);
       keys.forEach((key) => {
         props.push(targetNode.props);
       });
@@ -181,15 +181,15 @@ function traverseFifteen(node, cache) {
   } if (node._domID && !cache[node._debugID]) {
     cache[node._domID] = component;
   } else if (!cache[node._debugID] && !cache[node._domID]) {
-    var mountOrder = node._mountOrder / 10;
+    let mountOrder = node._mountOrder / 10;
     cache[mountOrder] = component;
   }
 
   // entering the children components recursively
-  var children = node._renderedChildren;
+  let children = node._renderedChildren;
   component.children = {};
   if (children) {
-    var keys = Object.keys(children);
+    let keys = Object.keys(children);
     keys.forEach((key) => {
       traverseFifteen(children[key], component.children);
     });
