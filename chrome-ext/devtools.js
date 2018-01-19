@@ -3,21 +3,21 @@ function createPanel() {
     'React-Scope', // title of the panel
     null, // the path to the icon
     'devtools.html', // html page for injecting into the tab's content
-    (sendMessage) // callback function optional
-  )
-  
+    (sendMessage), // callback function optional
+  );
+
   // let storage = {};
   const cache = new StateCache();
   let cleanData = []; // clean data
   let prevData = []; // previous state data
   let prevNode; // track of previous state
   let reactData = {}; // current state data
-  
+
   function sendMessage() {
     let port = chrome.runtime.connect({
       // name: 'ilhfmcnjanhibheilakfaahiehikcmgf',
       // name: 'gipfpnbcdiknjomlnphmckabkmoeebon'
-      name: chrome.runtime.id
+      name: chrome.runtime.id,
     });
     port.postMessage({
       name: 'connect',
@@ -30,20 +30,20 @@ function createPanel() {
       prevNode = cache.head.prev;
       cleanData = getChildren(reactData);
       console.log(cleanData, 'result');
-      return (messageReact(cleanData))
+      return (messageReact(cleanData));
     });
   }
   
-  function messageReact(data) { //sending the message to the React App
-    setTimeout(function() {
+  function messageReact(data) { // sending the message to the React App
+    setTimeout(() => {
       window.postMessage({
-        message: 'hello there from devtool.js!', 
-        data: data
-      }, '*')
-    }, 10)
-    return data
+        message: 'hello there from devtool.js!',
+        data,
+      }, '*');
+    }, 10);
+    return data;
   }
-  
+
   function retrieveState(string) {
     switch (string) {
       case 'current':
@@ -73,11 +73,11 @@ function createPanel() {
         console.log(cleanData, 'cleanData');
     }
   }
-  
+
   function getChildren(child) {
     let result = [];
-    let node = child;
-  
+    const node = child;
+
     if (node.name !== 'div') {
       result.push({
         name: node.name,
@@ -85,13 +85,13 @@ function createPanel() {
         state: node.state,
       });
     }
-  
-    for (keys in node.children) {
-      result = result.concat(getChildren(node.children[keys]));
-    }
+
+    Object.keys(node.children).forEach((key) => {
+      result = result.concat(getChildren(node.children[key]));
+    });
     return result;
   }
-  
+
   // convert data to JSON for storage
   function stringifyData(obj) {
     let box = [];
@@ -107,23 +107,23 @@ function createPanel() {
     box = null;
     return data;
   }
-  
+
   // Here we are using a doubly linked list to store state changes
   function StateCache() {
     this.head = null;
     this.tail = null;
   }
-  
+
   function Node(val) {
     this.value = val;
     this.next = null;
     this.prev = null;
   }
-  
+
   StateCache.prototype.addToHead = function (value) {
     const data = stringifyData(value);
     const node = new Node(data);
-  
+
     if (!this.head) {
       this.head = node;
       this.tail = node;
@@ -132,8 +132,7 @@ function createPanel() {
       this.head.next = node;
       this.head = node;
     }
-  }
+  };
 }
 
 createPanel();
-

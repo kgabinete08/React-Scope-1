@@ -1,8 +1,12 @@
+if (!window.__REACT_DEVTOOLS_GLOBAL_HOOK__) {
+  console.log('React Developer Tools must be installed for React Scope');
+}
+
 // added code for version 16 or lower
-var reactInstances = window.__REACT_DEVTOOLS_GLOBAL_HOOK__._renderers;
+var devTools = window.__REACT_DEVTOOLS_GLOBAL_HOOK__;
+var reactInstances = devTools._renderers;
 var rid = Object.keys(reactInstances)[0];
 var reactInstance = reactInstances[rid];
-var devTools = window.__REACT_DEVTOOLS_GLOBAL_HOOK__;
 
 var fiberDOM;
 var currState;
