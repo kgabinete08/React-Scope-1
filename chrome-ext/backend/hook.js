@@ -1,14 +1,14 @@
 // added code for version 16 or lower
-const reactInstances = window.__REACT_DEVTOOLS_GLOBAL_HOOK__._renderers;
-const rid = Object.keys(reactInstances)[0];
-const reactInstance = reactInstances[rid];
-const devTools = window.__REACT_DEVTOOLS_GLOBAL_HOOK__;
+var reactInstances = window.__REACT_DEVTOOLS_GLOBAL_HOOK__._renderers;
+var rid = Object.keys(reactInstances)[0];
+var reactInstance = reactInstances[rid];
+var devTools = window.__REACT_DEVTOOLS_GLOBAL_HOOK__;
 
-let fiberDOM;
-let currState;
-let initialState;
+var fiberDOM;
+var currState;
+var initialState;
 
-let runFifteen = false;
+var runFifteen = false;
 
 // get initial state and only run once
 function getInitialStateOnce() {
@@ -17,7 +17,7 @@ function getInitialStateOnce() {
   return function getInitialState() {
     if (!run) {
       // grab initial state
-      const initStateSet = devTools._fiberRoots[rid];
+      var initStateSet = devTools._fiberRoots[rid];
       initStateSet.forEach((item) => {
         initialState = item;
       });
@@ -31,7 +31,7 @@ function getInitialStateOnce() {
 // convert data to JSON for storage
 function stringifyData(obj) {
   let box = [];
-  const data = JSON.parse(
+  let data = JSON.parse(
     JSON.stringify(obj, (key, value) => {
       if (typeof value === 'object' && value !== null) {
         if (box.indexOf(value) !== -1) {
@@ -75,7 +75,7 @@ function stringifyData(obj) {
 }());
 
 // set initial state
-const setInitialStateOnce = getInitialStateOnce();
+var setInitialStateOnce = getInitialStateOnce();
 (function setInitialState() {
   if (reactInstance && reactInstance.version) {
     // get initial state for 16 or higher
@@ -122,20 +122,20 @@ async function getFiberDOM15() {
 
 // parse data from React 15
 async function parseData(components = {}) {
-  const root = reactInstance.Mount._instancesByReactRootID[1]._renderedComponent;
+  var root = reactInstance.Mount._instancesByReactRootID[1]._renderedComponent;
   traverseFifteen(root, components);
   // console.log(components)
-  const data = { currentState: components };
+  var data = { currentState: components };
   return data;
 }
 
 // traverse React 15
 function traverseFifteen(node, cache) {
-  const targetNode = node._currentElement;
+  var targetNode = node._currentElement;
   if (!targetNode) {
     return;
   }
-  const component = {
+  var component = {
     name: '',
     state: null,
     props: null,
@@ -162,9 +162,9 @@ function traverseFifteen(node, cache) {
 
   // props
   if (targetNode && targetNode.props) {
-    const props = [];
+    var props = [];
     if (typeof targetNode.props === 'object') {
-      const keys = Object.keys(targetNode.props);
+      var keys = Object.keys(targetNode.props);
       keys.forEach((key) => {
         props.push(targetNode.props);
       });
@@ -181,15 +181,15 @@ function traverseFifteen(node, cache) {
   } if (node._domID && !cache[node._debugID]) {
     cache[node._domID] = component;
   } else if (!cache[node._debugID] && !cache[node._domID]) {
-    const mountOrder = node._mountOrder / 10;
+    var mountOrder = node._mountOrder / 10;
     cache[mountOrder] = component;
   }
 
   // entering the children components recursively
-  const children = node._renderedChildren;
+  var children = node._renderedChildren;
   component.children = {};
   if (children) {
-    const keys = Object.keys(children);
+    var keys = Object.keys(children);
     keys.forEach((key) => {
       traverseFifteen(children[key], component.children);
     });
@@ -201,7 +201,7 @@ function traverseFifteen(node, cache) {
 // traverse React 16 fiber DOM
 function traverseComp(node, cache) {
   // LinkedList Style
-  const component = {
+  let component = {
     name: '',
     state: null,
     props: null,
@@ -222,9 +222,9 @@ function traverseComp(node, cache) {
   }
 
   if (node.memoizedProps) {
-    const props = [];
+    let props = [];
     if (typeof node.memoizedProps === 'object') {
-      const keys = Object.keys(node.memoizedProps);
+      let keys = Object.keys(node.memoizedProps);
       keys.forEach((key) => {
         props.push(node.memoizedProps[key]);
       });
@@ -253,8 +253,8 @@ function traverseComp(node, cache) {
 // check if reactDOM is even valid and this is for React 16 or above
 function checkReactDOM(reactDOM) {
   // console.log("checkReactDOM is running")
-  const data = { currentState: null };
-  const cache = {};
+  let data = { currentState: null };
+  let cache = {};
   if (reactDOM) {
     // console.log(reactDOM.current);
     traverseComp(reactDOM.current, cache); // maybe there is no need to use stateNode.current
@@ -269,6 +269,6 @@ function checkReactDOM(reactDOM) {
 function transmitData(cache) {
   console.log('transmitting', cache);
   // create a custom event to dispatch for actions for requesting data from background
-  const customEvent = new CustomEvent('React-Scope-Test', { detail: { data: stringifyData(cache) } });
+  let customEvent = new CustomEvent('React-Scope-Test', { detail: { data: stringifyData(cache) } });
   window.dispatchEvent(customEvent);
 }
