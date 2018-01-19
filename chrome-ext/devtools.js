@@ -24,9 +24,9 @@ function createPanel() {
       tabId: chrome.devtools.inspectedWindow.tabId,
     });
     port.onMessage.addListener((msg) => {
-      // console.log('cache', cache);
+      console.log('cache', cache);
       cache.addToHead(msg);
-      reactData = cache.head.value.data.currentState[1].children[3];
+      reactData = cache.head.value.data.currentState[1];
       prevNode = cache.head.prev;
       cleanData = getChildren(reactData);
       console.log(cleanData, 'result');
