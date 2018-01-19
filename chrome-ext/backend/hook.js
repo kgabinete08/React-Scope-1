@@ -7,6 +7,7 @@ var devTools = window.__REACT_DEVTOOLS_GLOBAL_HOOK__;
 var fiberDOM;
 var currState;
 var initialState;
+var reduxStore15;
 
 var runFifteen = false;
 
@@ -17,7 +18,7 @@ function getInitialStateOnce() {
   return function getInitialState() {
     if (!run) {
       // grab initial state
-      var initStateSet = devTools._fiberRoots[rid];
+      let initStateSet = devTools._fiberRoots[rid];
       initStateSet.forEach((item) => {
         initialState = item;
       });
@@ -113,7 +114,7 @@ async function getFiberDOM15() {
   // console.log("getFiberDOM15 is running")
   try {
     currState = await parseData();
-    // console.log("Current State: ", currState);
+    // don't send if state is null
     transmitData(currState);
   } catch (e) {
     console.log(e);
@@ -122,24 +123,25 @@ async function getFiberDOM15() {
 
 // parse data from React 15
 async function parseData(components = {}) {
-  var root = reactInstance.Mount._instancesByReactRootID[1]._renderedComponent;
+  let root = reactInstance.Mount._instancesByReactRootID[1]._renderedComponent;
   traverseFifteen(root, components);
   // console.log(components)
-  var data = { currentState: components };
+  let data = { currentState: components };
   return data;
 }
 
 // traverse React 15
 function traverseFifteen(node, cache) {
-  var targetNode = node._currentElement;
+  let targetNode = node._currentElement;
   if (!targetNode) {
     return;
   }
-  var component = {
+  let component = {
     name: '',
     state: null,
     props: null,
     children: {},
+    store: null,
   };
 
   if (targetNode.type) {
@@ -149,6 +151,13 @@ function traverseFifteen(node, cache) {
       component.name = targetNode.type.displayName;
     } else {
       component.name = targetNode.type;
+    }
+  }
+
+  // redux
+  if (targetNode.props) {
+    if (targetNode.type.name === 'Provider') {
+      component.store = targetNode.props.store.getState();
     }
   }
 
@@ -162,9 +171,9 @@ function traverseFifteen(node, cache) {
 
   // props
   if (targetNode && targetNode.props) {
-    var props = [];
+    let props = [];
     if (typeof targetNode.props === 'object') {
-      var keys = Object.keys(targetNode.props);
+      let keys = Object.keys(targetNode.props);
       keys.forEach((key) => {
         props.push(targetNode.props);
       });
@@ -181,15 +190,15 @@ function traverseFifteen(node, cache) {
   } if (node._domID && !cache[node._debugID]) {
     cache[node._domID] = component;
   } else if (!cache[node._debugID] && !cache[node._domID]) {
-    var mountOrder = node._mountOrder / 10;
+    let mountOrder = node._mountOrder / 10;
     cache[mountOrder] = component;
   }
 
   // entering the children components recursively
-  var children = node._renderedChildren;
+  let children = node._renderedChildren;
   component.children = {};
   if (children) {
-    var keys = Object.keys(children);
+    let keys = Object.keys(children);
     keys.forEach((key) => {
       traverseFifteen(children[key], component.children);
     });
@@ -219,6 +228,13 @@ function traverseComp(node, cache) {
 
   if (node.memoizedState) {
     component.state = node.memoizedState;
+  }
+
+  // redux store
+  if (node.type) {
+    if (node.type.name === 'Provider') {
+      reduxStore15 = node.stateNode.store.getState();
+    }
   }
 
   if (node.memoizedProps) {
@@ -262,13 +278,14 @@ function checkReactDOM(reactDOM) {
     return;
   }
   data.currentState = cache;
+  data.currentState[1].store = reduxStore15;
   // console.log('Store with Hierarchy: ', data);
   return data;
 }
 
-function transmitData(cache) {
-  console.log('transmitting', cache);
+function transmitData(state) {
+  console.log('cache', state);
   // create a custom event to dispatch for actions for requesting data from background
-  let customEvent = new CustomEvent('React-Scope-Test', { detail: { data: stringifyData(cache) } });
+  const customEvent = new CustomEvent('React-Scope-Test', { detail: { data: stringifyData(state) } });
   window.dispatchEvent(customEvent);
 }
