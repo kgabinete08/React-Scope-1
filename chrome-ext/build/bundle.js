@@ -18289,9 +18289,6 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-// const Main = () => <h1>Hello from react</h1>;
-
-
 var Main = function (_Component) {
   _inherits(Main, _Component);
 
@@ -18311,10 +18308,8 @@ var Main = function (_Component) {
     value: function componentDidMount() {
       var _this2 = this;
 
-      console.log('componentDidMount');
+      console.log('React is running!');
       window.addEventListener('message', function (event) {
-        console.log('inside of addEventListener');
-        console.log('event: ', event);
         // if (event.origin === "chrome-extension://gipfpnbcdiknjomlnphmckabkmoeebon") { //how do you get this?
         if (event.origin === "chrome-extension://" + chrome.runtime.id) {
           //how do you get this?
